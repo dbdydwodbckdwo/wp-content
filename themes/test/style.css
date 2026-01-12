@@ -1,0 +1,24 @@
+/*
+Theme Name: 나의 테마
+Author: 내가 씀. 이건 테스트용이다.
+Version: 0.0
+*/
+
+        .header {
+            background-color: rgb(19, 0, 129);
+            padding: 10px;
+            text-align: center;
+            font-size: 24px;
+            width: 100%;
+            color: white;
+        }
+
+        .footer {
+            background-color: rgb(148, 0, 0);
+            padding: 10px;
+            text-align: center;
+            font-size: 24px;
+            width: 100%;
+            color: white;
+        }
+        
