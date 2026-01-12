@@ -173,13 +173,12 @@ add_action('save_post_test1', function ($post_id) {
  */
 
 // register_taxonomy('분류 이름', '어떤 포스트타입에 적용할지', [옵션들]);
-register_taxonomy('test1_custom_ctgr', 'test1', [
+register_taxonomy('test1_custom_ctgr_1', 'test1', [
     'label' => '커스텀 카테고리 택소노미_1',
     'hierarchical' => true,
 ]);
 
-// register_taxonomy('분류 이름', '어떤 포스트타입에 적용할지', [옵션들]);
-register_taxonomy('test1_custom_ctgr', 'test1', [
+register_taxonomy('test1_custom_ctgr_2', 'test1', [
     'label' => '커스텀 카테고리 택소노미_2',
     'hierarchical' => true,
 ]);
