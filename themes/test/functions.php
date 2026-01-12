@@ -31,25 +31,30 @@ add_action('init', function () {
 */
 add_action('pre_get_posts', function ($query) {
 
-    if (is_admin()) return; // 관리자 페이지면 종료
-    if (!$query->is_main_query()) return; // 메인 쿼리가 아니면 종료
-    if (!is_category()) return; 
+    // REST API 요청 차단 (필수)
+    if (defined('REST_REQUEST') && REST_REQUEST) return;
 
-    $query->set('post_type', ['post', 'mypage', 'test1']);
-});
-
-add_action('pre_get_posts', function ($query) {
-
+    // 관리자 화면 차단
     if (is_admin()) return;
+
+    // 메인 쿼리만
     if (!$query->is_main_query()) return;
 
-    // test1 아카이브 전용
+    // 1️⃣ 카테고리 페이지에서 post + mypage + test1
+    if (is_category()) {
+        $query->set('post_type', ['post', 'mypage', 'test1']);
+        return;
+    }
+
+    // 2️⃣ test1 아카이브 전용 설정
     if ($query->is_post_type_archive('test1')) {
         $query->set('posts_per_page', 12);
         $query->set('orderby', 'date');
         $query->set('order', 'DESC');
+        return;
     }
 });
+
 
 
 
