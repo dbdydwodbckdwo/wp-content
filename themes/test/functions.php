@@ -27,7 +27,8 @@ add_action('init', function () {
 /**
  * 
  * 메인 쿼리
-* 카테고리 페이지에서 post + mypage + test1 같이 나오게 사용자가 코드로 쿼리 조작
+ * 작동 시점 : WP_Query 객체가 실제 쿼리를 실행하기 직전
+*  @param WP_Query $query
 */
 add_action('pre_get_posts', function ($query) {
 
@@ -125,7 +126,8 @@ function render_test1_box3($post) {
 
 /**
  * test1(CPT게시판테스트_1) 메타 저장
- * 
+ * 작동 시점 : test1 타입의 글이 저장될 때, 이 타이밍에 이 함수를 실행해라
+ * save_post_포스트타입
  */
 add_action('save_post_test1', function ($post_id) {
 
@@ -134,14 +136,18 @@ add_action('save_post_test1', function ($post_id) {
     // 메타저장 : 본문과 제목을 제외하고 글에 붙는 추가 정보 
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
 
+    // 현재 유저가 글 수정 권한이 있는지 확인
+    // current_user_can() → 사람 검증
     if (!current_user_can('edit_post', $post_id)) return;
 
+    // wp_verify_nonce() → 요청 검증
+    // 이 요청이 관리자 화면에서 정상적으로 발생했는지 확인하기 위한 1회용 검증값
     if (
         !isset($_POST['project_nonce']) ||
         !wp_verify_nonce($_POST['project_nonce'], 'save_project')
     ) return;
 
-
+    
     if (isset($_POST['test1_box1'])) {
         update_post_meta(
             $post_id,
@@ -172,7 +178,7 @@ add_action('save_post_test1', function ($post_id) {
 /**
  * test1(CPT게시판테스트_1) 전용 분류 (커스텀 택소노미) 등록
  * test1 글들을 test1_custom_ctgr 라는 분류로 묶기 위함. 
- * 화면에는 label 이라는 이름으로 표시됨
+ * 화면에는 label 이라는 옵션이 이름으로 표시됨
  * 현재는 rewrite 옵션이 없어서 URL은 /test1_custom_ctgr/카테고리명/ 형태로 접근 가능
  * 카테고리명은 관리자 화면에서 직접 지정 가능
  */
@@ -191,10 +197,37 @@ register_taxonomy('test1_custom_ctgr_2', 'test1', [
 
 
 /**
- * 7️⃣ 테마 스타일시트 로드
+ * 기본 테마 스타일시트 로드
+ * 
  * add_action(액션이름, 콜백함수)
  * wp_enqueue_scripts(액션이름, 기본 제공 스타일시트 또는 커스텀 스타일시트 로드 함수)
+ * 
+ * 아래 코드에서는 get_stylesheet_uri() 함수를 사용하여,
+ *  현재 활성화된 테마의 스타일시트 URI를 가져와서 로드함
+ * 
+ * 반영되는 곳은 워드프레스 사이트의 모든 페이지
+ * 
+ * 아래 코드에서 my-theme-style 는 스타일시트 핸들 이름으로, 
+ * 이 이름을 사용하여 나중에 스타일시트를 참조하거나 제거할 수 있음
+ * 
+ * 특정 css를 특정 페이지에서만 로드하고 싶다면?
+ * is_page_template('템플릿이름.php') 함수를 사용하여 특정 페이지 템플릿에서만 스타일시트를 로드할 수 있음
+ * 반영되는 곳은 home.php 템플릿을 사용하는 페이지
  */
 add_action('wp_enqueue_scripts', function () {
-    wp_enqueue_style('my-theme-style', get_stylesheet_uri());
+
+    // 전체 페이지 공통 CSS
+    wp_enqueue_style(
+        'my-theme-style',
+        get_stylesheet_uri()
+    );
+
+    // home.php 템플릿 전용 CSS
+    if (is_page_template('home.php')) {
+        wp_enqueue_style(
+            'home-style',
+            get_template_directory_uri() . '/css/home.css'
+        );
+    }
 });
+
